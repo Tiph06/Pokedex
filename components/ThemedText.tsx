@@ -47,8 +47,8 @@ export function ThemedText({ variant, color, ...rest }: Props) {
     return (
         <Text            
         style={[styles[variant ?? 'body3'], { color: colors[color ?? "grayDark"] }]}
-            {...rest}
-        ></Text>
+            {...rest}>
+        </Text>
     );
 }
 
