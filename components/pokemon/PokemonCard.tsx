@@ -1,22 +1,23 @@
 import { Link } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, View, ViewStyle } from 'react-native';
+import { Image, Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Card } from '../Card';
 import { ThemedText } from '../ThemedText';
 
-interface Props {
+type Props = {
 id: number;
 name: string;
 style?: ViewStyle;
 }
 
 export function PokemonCard({ id, name, style }: Props) {
-const colors = useThemeColors();
 
-    return (
-    <Link href={`/pokemon/${id}`} asChild>
-    {/* <Pressable style={style}> */}
+    const colors = useThemeColors();
+
+return (
+    <Link href={`./pokemon/${id}`} asChild>
+    <Pressable style={style}>
     <Card style={styles.card}>
         {/* Ombre du Pokémon */}
         <View style={[
@@ -24,25 +25,25 @@ const colors = useThemeColors();
             { backgroundColor: colors.grayBackground }
         ]} />
 {/* Numéro */}
-<ThemedText
+    <ThemedText
 variant="caption"
 color="grayMedium"
 style={styles.id}
->
+    >
 #{id.toString().padStart(3, '0')}
 </ThemedText>
 
 {/* Image */}
-<Image source={{
-uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/poke'
-}} width={72} height={72} />
+<Image 
+    source=
+    {{uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` }} width={72} height={72} />
 
 {/* Nom */}
 <ThemedText variant="body3">
 {name}
 </ThemedText>
 </Card>
-{/* </Pressable> */}
+</Pressable>
 </Link>
 );
 }
