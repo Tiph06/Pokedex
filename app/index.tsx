@@ -1,12 +1,14 @@
+import { Colors } from "@/app-example/constants/Colors";
 import { Card } from "@/components/Card";
 import { Header } from "@/components/Header";
+import { useGridWidth } from "@/hooks/useGridWidth";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getPokemonListFr } from "../components/pokemon/getPokemonListFr";
 import { PokemonCard } from "../components/pokemon/PokemonCard";
 import { useThemeColors } from "../hooks/useThemeColors";
-import { getPokemonListFr } from "./pokemon/getPokemonListFr";
 
 type PokemonListItem = {
   id: number;
@@ -16,23 +18,29 @@ type PokemonListItem = {
 export default function Index() {
   const colors = useThemeColors();
 
-  // 📡 Récupération des données via PokéAPI
+  // Récupération des données via PokéAPI
   const { data, isLoading } = useQuery({
     queryKey: ["pokemons-fr"],
     queryFn: getPokemonListFr
   });
 
-  // 📏 Calcul dynamique de la largeur des cartes
-  const [gridWidth, setGridWidth] = React.useState(0);
+  // 👇 paramètres d’affichage
   const numColumns = 3;
-  const gap = 8;
+  const columnGap = 16;
   const contentPadding = 12;
-  const cardWidth = gridWidth > 0
-    ? (gridWidth - (numColumns - 1) * gap - contentPadding * 2) / numColumns
-    : 0;
+  const CARD_PADDING = 8; // padding défini dans Card.tsx
 
 
-  // ⏳ Loading
+  // 👇 remplace gridWidth/cardWidth par le hook
+  const { itemWidth, onLayout } = useGridWidth(
+    numColumns,
+    columnGap,
+    contentPadding + CARD_PADDING // on soustrait bien 12 + 8 de chaque côté
+
+  );
+
+
+  //  Loading
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.tint }]}>
@@ -41,35 +49,35 @@ export default function Index() {
     );
   }
 
-  // 📋 Liste finale
+  //  Liste finale
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.tint }]}>
-      {/* 🔝 Header */}
+      
+      {/* Header */}
       <Header />
 
-      {/* 📦 Liste dans une Card */}
+      {/* Liste dans une Card */}
       <Card
         style={styles.body}
-        onLayout={(e) => setGridWidth(e.nativeEvent.layout.width)}
+        onLayout={onLayout}
       >
+
         {Array.isArray(data) && (
           <FlatList
             data={data as PokemonListItem[]}
             numColumns={numColumns}
             contentContainerStyle={{
-              rowGap: gap,
-              paddingHorizontal: contentPadding, // ✅ même padding à gauche et à droite
+              rowGap: columnGap,
+              paddingHorizontal: contentPadding,
+              paddingVertical: 12,
             }}
-            columnWrapperStyle={{
-              columnGap: gap,
-            }}
+            columnWrapperStyle={{ columnGap }}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <PokemonCard
                 id={item.id}
-                name={
-                  item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-                style={{ width: cardWidth }}
+                name={item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                style={{ width: itemWidth }} // 👈 largeur calculée par le hook
               />
             )}
           />
@@ -82,12 +90,12 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 4,
-    paddingVertical: 8
+    backgroundColor: Colors.light.tint, // rouge
   },
 
   body: {
-    flex: 1,
-    marginTop: 16
+  flex: 1,
+marginHorizontal: 12, // 12px gauche/droite
+  marginVertical: 24, // 24px haut/bas
   }
 });

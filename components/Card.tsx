@@ -4,15 +4,17 @@ import { shadows } from '../constants/Shadows';
 
 interface Props extends ViewProps {}
 
-export function Card({ style, ...props }: Props) {
+export function Card({ style, children, ...props }: Props) {
 
     return (
         <View
             style={[
                 styles.card,
                 shadows.dp2,
-                style]} {...props} />
-);
+                style]} {...props} >
+                {children}
+            </View>
+    );
 }
 const styles = StyleSheet.create({
     card: {
